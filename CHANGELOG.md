@@ -4,6 +4,11 @@
 
 * General
   * Implement ping tagging (i.e. the `X-Source-Tags` header) ([#1074](https://github.com/mozilla/glean/pull/1074)). Note that this is not yet implemented for iOS.
+  * DEPRECATION: `getUploadEnabled` is deprecated (respectively `get_upload_enabled` in Python) ([#1046](https://github.com/mozilla/glean/pull/1046))
+    * Due to Glean's asynchronous initialization the return value can be incorrect.
+      Applications should not rely on Glean's internal state.
+      Upload enabled status should be tracked by the application and communicated to Glean if it changes.
+      Note: The method was removed from the C# and Python implementation.
 * Python
   * The Python unit tests no longer send telemetry to the production telemetry endpoint.
 * Android

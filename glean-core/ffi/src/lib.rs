@@ -44,6 +44,10 @@ use handlemap_ext::HandleMapExtension;
 use ping_type::PING_TYPES;
 use upload::FfiPingUploadTask;
 
+// DO NOT MERGE!
+// We don't need this since they are pulled anyways, but just to be explicit for the prototype!
+pub use nimbus_experiments::ffi::{experiements_destroy, experiments_get_branch, experiments_new};
+pub use nimbus_experiments::viaduct::*;
 /// Execute the callback with a reference to the Glean singleton, returning a `Result`.
 ///
 /// The callback returns a `Result<T, E>` while:

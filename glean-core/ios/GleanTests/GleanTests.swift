@@ -72,7 +72,7 @@ class GleanTests: XCTestCase {
     func testExperimentRecordingBeforeGleanInit() {
         // This test relies on Glean not being initialized and the task queueing to be on
         Glean.shared.testDestroyGleanHandle()
-        Dispatchers.shared.setTaskQueuing(enabled: true)
+        Dispatchers.shared.setTaskQueueing(enabled: true)
 
         Glean.shared.setExperimentActive(
             experimentId: "experiment_set_preinit",

@@ -118,7 +118,7 @@ public class Glean {
             }
 
             if let debugViewTag = self.debugViewTag {
-                self.setDebugViewTag(debugViewTag)
+                _ = self.setDebugViewTag(debugViewTag)
             }
 
             if self.logPings {

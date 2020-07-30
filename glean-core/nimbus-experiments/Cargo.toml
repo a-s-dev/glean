@@ -21,6 +21,7 @@ rkv = "0.10"
 lazy_static = "1.4"
 uuid = { version = "0.8", features = ["serde", "v4"]}
 prost = "0.6"
+chrono = { version = "0.4", features = ["serde"]}
 
 [build-dependencies]
 prost-build = { version = "0.6" }
@@ -31,4 +32,5 @@ crate-type = ["lib"]
 
 [dev-dependencies]
 viaduct-reqwest = { git = "https://github.com/mozilla/application-services" }
+mockito = "0.27"
 

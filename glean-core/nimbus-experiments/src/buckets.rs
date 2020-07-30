@@ -33,11 +33,13 @@ impl Bucket {
         let enrolled_experiments = all_experiments
             .iter()
             .filter_map(|e| {
-                let branch = num.gen::<usize>() % e.branches.len();
-                if bucket_no > e.bucket_info.count && bucket_no < e.bucket_info.start {
+                let branch = num.gen::<usize>() % e.arguments.branches.len();
+                if bucket_no > e.arguments.bucket_config.count
+                    && bucket_no < e.arguments.bucket_config.start
+                {
                     Some(EnrolledExperiment {
                         id: e.id.clone(),
-                        branch: e.branches[branch].name.clone(),
+                        branch: e.arguments.branches[branch].slug.clone(),
                     })
                 } else {
                     None

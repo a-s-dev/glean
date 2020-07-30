@@ -7,9 +7,12 @@ fn main() -> Result<()> {
     exp.get_experiments().iter().for_each(|e| {
         print!(
             "Experiment: \"{}\", Buckets: {} to {}, Branches: ",
-            e.id, e.bucket_info.count, e.bucket_info.start
+            e.id, e.arguments.bucket_config.count, e.arguments.bucket_config.start
         );
-        e.branches.iter().for_each(|b| print!(" \"{}\", ", b.name));
+        e.arguments
+            .branches
+            .iter()
+            .for_each(|b| print!(" \"{}\", ", b.slug));
         println!()
     });
     println!("You are in bucket: {}", exp.get_bucket());

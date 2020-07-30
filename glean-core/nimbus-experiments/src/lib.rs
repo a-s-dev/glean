@@ -13,6 +13,7 @@ mod matcher;
 mod persistence;
 
 use buckets::{Bucket, EnrolledExperiment};
+use chrono::{DateTime, Utc};
 use error::Result;
 pub use ffi::{experiements_destroy, experiments_get_branch, experiments_new};
 use http_client::{Client, SettingsClient};
@@ -116,31 +117,69 @@ impl Experiments {
 }
 
 // ============ Below are a bunch of types that gets serialized/deserialized and stored in our `Experiments` struct ============
-// ============ They currently follow the old schema, and need to be updated to match the new Nimbus schema         ============
 
-#[derive(Deserialize, Serialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct Experiment {
     pub id: String,
-    pub description: String,
-    pub last_modified: u64,
-    pub schema_modified: Option<u64>,
-    #[serde(rename = "buckets")]
-    pub bucket_info: BucketInfo,
+    pub filter_expression: String,
+    pub targeting: Option<String>,
+    pub enabled: bool,
+    pub arguments: ExperimentArguments,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct ExperimentArguments {
+    pub slug: String,
+    pub user_facing_name: String,
+    pub user_facing_description: String,
+    pub active: bool,
+    pub is_enrollment_paused: bool,
+    pub bucket_config: BucketConfig,
+    pub features: Vec<String>,
     pub branches: Vec<Branch>,
-    #[serde(rename = "match")]
-    pub matcher: Matcher,
+    pub start_date: Option<DateTime<Utc>>,
+    pub end_date: Option<DateTime<Utc>>,
+    pub proposed_duration: u64,
+    pub proposed_enrollment: u64,
+    pub reference_branch: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct BucketInfo {
-    pub count: u32,
-    pub start: u32,
-}
-
-#[derive(Deserialize, Serialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct Branch {
-    pub name: String,
-    ratio: u32,
+    pub slug: String,
+    pub ratio: u32,
+    pub group: Option<Vec<Group>>,
+    pub value: BranchValue,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum Group {
+    Cfr,
+    AboutWelcome,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct BranchValue {}
+
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct BucketConfig {
+    pub randomization_unit: RandomizationUnit,
+    pub namespace: String,
+    pub start: u32,
+    pub count: u32,
+    pub total: u32,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum RandomizationUnit {
+    ClientId,
+    NormandyId,
+    UserId,
 }
 
 // TODO: Implement unit tests

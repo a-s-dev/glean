@@ -2,7 +2,7 @@ use anyhow::Result;
 use nimbus_experiments::{AppContext, Experiments};
 fn main() -> Result<()> {
     viaduct_reqwest::use_reqwest_backend();
-    let exp = Experiments::new(AppContext::default(), "./mydb");
+    let exp = Experiments::new(AppContext::default(), "./mydb", None);
     let enrolled_exp = exp.get_enrolled_experiments();
     exp.get_experiments().iter().for_each(|e| {
         print!(

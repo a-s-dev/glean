@@ -23,7 +23,7 @@ pub extern "C" fn experiments_new(
             from_protobuf_ptr::<AppContext, msg_types::AppContext>(app_ctx, app_ctx_len).unwrap()
         }; // Todo: make the whole function unsafe and implement proper error handling in error.rs
         log::info!("=================== Initializing experiments ========================");
-        Ok(Experiments::new(app_ctx, db_path.as_str()))
+        Ok(Experiments::new(app_ctx, db_path.as_str(), None))
     })
 }
 

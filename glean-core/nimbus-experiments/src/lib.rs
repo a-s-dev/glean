@@ -18,7 +18,6 @@ use error::Result;
 pub use ffi::{experiements_destroy, experiments_get_branch, experiments_new};
 use http_client::{Client, SettingsClient};
 pub use matcher::AppContext;
-use matcher::Matcher;
 use persistence::Database;
 use serde_derive::*;
 use std::path::Path;
@@ -55,27 +54,46 @@ pub struct Experiments {
     bucket: Bucket,
 }
 
+pub struct Config {
+    server_url: Option<String>,
+    uuid: Option<Uuid>,
+    collection_name: Option<String>,
+    bucket_name: Option<String>,
+}
+
 impl Experiments {
     /// A new experiments struct is created, this is where some preprocessing happens
     /// It should look for persisted state first and setup some type
     /// Of interval retrieval from the server for any experiment updates (not implemented)
-    /// TODO: Add an optional `ServerConfig` that allows clients to set servier settings
-    pub fn new<P: AsRef<Path>>(app_ctx: AppContext, path: P) -> Self {
+    pub fn new<P: AsRef<Path>>(app_ctx: AppContext, path: P, config: Option<Config>) -> Self {
         let database = Database::new(path).unwrap();
         let persisted_data = database.get::<Self>("persisted").unwrap();
         if let Some(inner) = persisted_data {
             log::info!("Retrieving data from persisted state...");
             return inner;
         }
+
+        let (base_url, collection_name, bucket_name, uuid) = match config {
+            Some(config) => (
+                config.server_url.unwrap_or(BASE_URL.to_string()),
+                config
+                    .collection_name
+                    .unwrap_or(COLLECTION_NAME.to_string()),
+                config.bucket_name.unwrap_or(BUCKET_NAME.to_string()),
+                config.uuid.unwrap_or_else(|| uuid::Uuid::new_v4()),
+            ),
+            None => (
+                BASE_URL.to_string(),
+                COLLECTION_NAME.to_string(),
+                BUCKET_NAME.to_string(),
+                uuid::Uuid::new_v4(),
+            ),
+        };
+
         // TODO: Implement a type of interval schedule to check with the server for any
         // updates
-        let http_client = Client::new(
-            Url::parse(BASE_URL).unwrap(),
-            COLLECTION_NAME.to_string(),
-            BUCKET_NAME.to_string(),
-        );
+        let http_client = Client::new(Url::parse(&base_url).unwrap(), collection_name, bucket_name);
         let resp = http_client.get_experiments().unwrap();
-        let uuid = uuid::Uuid::new_v4();
         let bucket = Bucket::new(uuid, &resp);
         let experiments = Self {
             app_ctx,

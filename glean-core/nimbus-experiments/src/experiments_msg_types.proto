@@ -1,0 +1,54 @@
+syntax = "proto2";
+
+// Note half of this file is the proto from viaduct
+// It beats the purpose having another proto for that, and this opens
+// the door to all sorts of mismatch errors. So
+// TODO: Figure out a way to ensure consistency between this file with the viaduct one
+
+package mozilla.telemetry.glean.protobuf;
+
+option java_package = "mozilla.telemetry.glean";
+option java_outer_classname = "MsgTypes";
+option swift_prefix = "MsgTypes_";
+option optimize_for = LITE_RUNTIME;
+
+message Request {
+    enum Method {
+        GET = 0;
+        HEAD = 1;
+        POST = 2;
+        PUT = 3;
+        DELETE = 4;
+        CONNECT = 5;
+        OPTIONS = 6;
+        TRACE = 7;
+    }
+    required Method method = 1;
+    required string url = 2;
+    optional bytes body = 3;
+    map<string, string> headers = 4;
+    required bool follow_redirects = 5;
+    required bool use_caches = 6;
+    required int32 connect_timeout_secs = 7;
+    required int32 read_timeout_secs = 8;
+}
+
+message Response {
+    // If this is present, nothing else is.
+    optional string exception_message = 1;
+    optional string url = 2;
+    optional int32 status = 3;
+    optional bytes body = 4;
+    map<string, string> headers = 5;
+}
+
+message AppContext {
+    optional string app_id = 1;
+    optional string app_version = 2;
+    optional string locale_language = 3;
+    optional string locale_country = 4;
+    optional string device_manufacturer = 5;
+    optional string device_model = 6;
+    optional string region = 7;
+    optional string debug_tag = 8;
+}
